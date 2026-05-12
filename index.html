@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Profesional DAM · Escolapios de Getafe</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f3ef;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --border: #ddd9d2;
+  --text: #1a1714;
+  --text2: #5a534a;
+  --accent: #c8501a;
+  --accent2: #e8832a;
+  --accent-light: #fdf0e8;
+  --gap-color: #d44040;
+  --gap-bg: #fff0f0;
+  --ok-color: #2a7a3b;
+  --ok-bg: #edfaef;
+  --step-active: #c8501a;
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --radius: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1,h2,h3,h4 { font-family: 'DM Serif Display', serif; font-weight: 400; }
+
+/* Header */
+#app-header {
+  background: var(--text);
+  color: #fff;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+#app-header .logo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#app-header .logo-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+#app-header .logo-sub {
+  font-size: 0.72rem;
+  color: #b0aa9f;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #a83e12; }
+.btn-ghost { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.btn-ghost:hover { background: rgba(255,255,255,0.18); }
+.btn-danger { background: #8b2020; color: #fff; }
+.btn-danger:hover { background: #6a1818; }
+.btn-dark { background: var(--text); color: #fff; }
+.btn-dark:hover { background: #333; }
+.btn-outline { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+.btn-outline:hover { background: var(--accent-light); }
+
+/* Progress */
+#progress-bar-wrap {
+  background: #2e2a26;
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 62px;
+  z-index: 99;
+}
+#progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+#progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+#progress-label {
+  font-size: 0.75rem;
+  color: #b0aa9f;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* Step nav */
+#step-nav {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  padding: 0 24px;
+}
+.step-tab {
+  padding: 12px 18px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all 0.18s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.step-tab:hover { color: var(--accent); }
+.step-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.step-tab.done { color: var(--ok-color); }
+
+/* Main */
+#main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+.step-header {
+  margin-bottom: 28px;
+}
+.step-header h2 {
+  font-size: 1.6rem;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.step-header p {
+  color: var(--text2);
+  font-size: 0.9rem;
+}
+.step-number {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 99px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  color: var(--text);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Form elements */
+label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 5px;
+}
+input[type=text], input[type=url], input[type=date], textarea, select {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border 0.18s;
+  outline: none;
+  margin-bottom: 14px;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  background: #fff;
+}
+textarea { resize: vertical; min-height: 70px; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width:600px){ .field-row { grid-template-columns: 1fr; } }
+
+/* Info field (read-only) */
+.info-field {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  color: var(--text2);
+  margin-bottom: 14px;
+}
+.info-label { font-size: 0.78rem; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+
+/* Radio situación */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.radio-item input { display: none; }
+.radio-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: all 0.15s;
+  font-weight: 400;
+  margin: 0;
+}
+.radio-item label:hover { border-color: var(--accent); background: var(--accent-light); }
+.radio-item input:checked + label { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.radio-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.radio-item input:checked + label .radio-dot::after {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* Competencias table */
+.comp-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.comp-table th {
+  text-align: left;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 6px;
+  border-bottom: 2px solid var(--border);
+}
+.comp-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-name { font-size: 0.85rem; font-weight: 500; min-width: 120px; padding-top: 10px; }
+.star-row { display: flex; gap: 2px; }
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.15rem;
+  color: #d0c9bf;
+  transition: color 0.12s;
+  padding: 2px;
+  line-height: 1;
+}
+.star-btn.active { color: var(--accent2); }
+.star-btn:hover { color: var(--accent); }
+.comp-select {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  background: var(--bg);
+  color: var(--text);
+  margin-bottom: 0;
+}
+.gap-badge {
+  display: inline-block;
+  background: var(--gap-bg);
+  color: var(--gap-color);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 99px;
+  border: 1px solid #f5c0c0;
+  margin-top: 3px;
+}
+.gap-notice {
+  background: var(--gap-bg);
+  border: 1px solid #f5c0c0;
+  border-radius: 7px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--gap-color);
+}
+.gap-notice strong { display: block; margin-bottom: 4px; }
+
+/* Tags / checkboxes seleccionables */
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tag-check input { display: none; }
+.tag-check label {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 99px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+  margin: 0;
+  font-weight: 400;
+}
+.tag-check label:hover { border-color: var(--accent); color: var(--accent); }
+.tag-check input:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+
+/* SMART */
+.smart-formula {
+  background: var(--accent-light);
+  border: 1.5px solid #f0c8a8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.smart-formula em { color: var(--accent); font-style: normal; font-weight: 500; }
+.smart-edit {
+  width: 100%;
+  border: 1.5px solid #f0c8a8;
+  border-radius: 7px;
+  padding: 12px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text);
+  min-height: 90px;
+  resize: vertical;
+  font-family: 'DM Sans', sans-serif;
+}
+.smart-edit:focus { border-color: var(--accent); outline: none; }
+
+/* DAFO grid */
+.dafo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+@media(max-width:580px){ .dafo-grid { grid-template-columns: 1fr; } }
+.dafo-cell {
+  border-radius: 8px;
+  padding: 14px;
+  border: 1.5px solid var(--border);
+}
+.dafo-cell.fortalezas { background: #edfaef; border-color: #b5dfbe; }
+.dafo-cell.debilidades { background: #fff7ed; border-color: #f5c8a0; }
+.dafo-cell.oportunidades { background: #edf4ff; border-color: #b0cbf5; }
+.dafo-cell.amenazas { background: #fff0f0; border-color: #f5c0c0; }
+.dafo-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+.dafo-cell.fortalezas .dafo-label { color: #2a7a3b; }
+.dafo-cell.debilidades .dafo-label { color: #a85010; }
+.dafo-cell.oportunidades .dafo-label { color: #2050a0; }
+.dafo-cell.amenazas .dafo-label { color: #8b2020; }
+.dafo-cell textarea { background: transparent; border: none; border-radius: 0; padding: 4px 0; margin: 0; min-height: 70px; font-size: 0.85rem; }
+.dafo-cell textarea:focus { border: none; background: rgba(255,255,255,0.4); border-radius: 4px; }
+
+/* Plan de acción */
+.plan-table { width: 100%; border-collapse: collapse; }
+.plan-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  padding: 8px 8px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+}
+.plan-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.plan-table tr:last-child td { border-bottom: none; }
+.plan-table input, .plan-table select { margin: 0; font-size: 0.8rem; padding: 5px 7px; }
+.btn-add-row { margin-top: 10px; }
+.btn-rm { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; }
+.btn-rm:hover { background: #ffe5e5; }
+
+/* Recursos */
+.recursos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* Sugerencias chips */
+.sugerencias { margin-bottom: 10px; }
+.sugerencias-title { font-size: 0.75rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.sugerencia-chip {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 11px;
+  font-size: 0.78rem;
+  margin: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--text2);
+}
+.sugerencia-chip:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+
+/* Motivational */
+.motivacion {
+  background: linear-gradient(135deg, #fff7ed, #fdf0e8);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 16px;
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.88rem;
+}
+
+/* INFORME */
+#informe-preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+#informe-preview h1 { font-size: 1.7rem; margin-bottom: 4px; }
+#informe-preview h2 { font-size: 1.15rem; margin: 22px 0 10px; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+#informe-preview h3 { font-size: 0.95rem; margin: 12px 0 4px; color: var(--text2); }
+#informe-preview p { margin-bottom: 8px; font-size: 0.88rem; }
+#informe-preview table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 8px; }
+#informe-preview th { background: var(--surface2); padding: 6px 10px; text-align: left; font-size: 0.75rem; border: 1px solid var(--border); }
+#informe-preview td { padding: 6px 10px; border: 1px solid var(--border); }
+.informe-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; font-size: 0.85rem; color: var(--text2); }
+.informe-meta span strong { color: var(--text); }
+.informe-dafo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.informe-dafo-cell { border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 0.82rem; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.tag-list .tag { display: inline-block; background: var(--accent-light); color: var(--accent); border-radius: 99px; padding: 2px 10px; font-size: 0.78rem; border: 1px solid #f0c8a8; }
+.gap-list .tag { background: var(--gap-bg); color: var(--gap-color); border-color: #f5c0c0; }
+
+/* Nav buttons */
+.step-nav-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.step-nav-btns .btn { min-width: 100px; }
+
+/* Print */
+@media print {
+  #app-header, #progress-bar-wrap, #step-nav, #main > .step-panel:not(#step7), .step-nav-btns, .header-actions { display: none !important; }
+  #main { padding: 0; max-width: 100%; }
+  #step7 { display: block !important; }
+  #informe-preview { box-shadow: none; border: none; padding: 0; }
+  body { background: #fff; font-size: 12pt; }
+  #informe-preview h1 { font-size: 20pt; }
+  #informe-preview h2 { font-size: 13pt; }
+  .informe-dafo { grid-template-columns: 1fr 1fr; }
+}
+
+/* Responsive tweaks */
+@media(max-width:640px){
+  #app-header { padding: 14px 16px; }
+  #main { padding: 20px 12px 60px; }
+  .comp-table { font-size: 0.82rem; }
+  #informe-preview { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header id="app-header">
+  <div class="logo">
+    <span class="logo-title">Proyecto Profesional DAM</span>
+    <span class="logo-sub">Escolapios de Getafe · Autoguardado activo</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="guardarAhora()">💾 Guardar</button>
+    <button class="btn btn-ghost" onclick="imprimirInforme()">🖨️ Imprimir / PDF</button>
+    <button class="btn btn-ghost" onclick="descargarHTML()">⬇️ Descargar HTML</button>
+    <button class="btn btn-danger" onclick="borrarTodo()">🗑️ Borrar todo</button>
+  </div>
+</header>
+
+<div id="progress-bar-wrap">
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <span id="progress-label">Paso 1 de 7</span>
+</div>
+
+<nav id="step-nav">
+  <button class="step-tab active" onclick="goStep(1)">1. Datos</button>
+  <button class="step-tab" onclick="goStep(2)">2. Competencias</button>
+  <button class="step-tab" onclick="goStep(3)">3. Intereses</button>
+  <button class="step-tab" onclick="goStep(4)">4. Oferta real</button>
+  <button class="step-tab" onclick="goStep(5)">5. Objetivo SMART</button>
+  <button class="step-tab" onclick="goStep(6)">6. DAFO y Plan</button>
+  <button class="step-tab" onclick="goStep(7)">7. Informe final</button>
+</nav>
+
+<main id="main">
+
+<!-- PASO 1 -->
+<section class="step-panel active" id="step1">
+  <div class="step-header">
+    <span class="step-number">Paso 1</span>
+    <h2>Datos personales</h2>
+    <p>Introduce tu nombre y elige tu situación de partida.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Identificación</div>
+    <label>Nombre y apellidos</label>
+    <input type="text" id="nombre" placeholder="Escribe tu nombre completo" oninput="autoSave()">
+    <div class="field-row">
+      <div>
+        <div class="info-label">Centro</div>
+        <div class="info-field">Escolapios de Getafe</div>
+      </div>
+      <div>
+        <div class="info-label">Ciclo</div>
+        <div class="info-field">Técnico Superior en DAM</div>
+      </div>
+    </div>
+    <div>
+      <div class="info-label">Fecha</div>
+      <div class="info-field" id="fecha-display"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Situación inicial</div>
+    <p style="margin-bottom:14px;font-size:.85rem;color:var(--text2)">¿Cuál es tu situación o intención principal ahora mismo?</p>
+    <div class="radio-grid">
+      <div class="radio-item"><input type="radio" name="situacion" id="s1" value="Busco mi primera oportunidad laboral" onchange="autoSave()"><label for="s1"><span class="radio-dot"></span>Primera oportunidad laboral</label></div>
+      <div class="radio-item"><input type="radio" name="situacion" id="s2" value="Quiero preparar la FCT" onchange="autoSave()"><label for="s2"><span class="radio-dot"></span>Preparar la FCT</label></div>
+      <div class="radio-item"><input type="radio" name="situacion" id="s3" value="Quiero seguir estudiando" onchange="autoSave()"><label for="s3"><span class="radio-dot"></span>Seguir estudiando</label></div>
+      <div class="radio-item"><input type="radio" name="situacion" id="s4" value="Quiero especializarme" onchange="autoSave()"><label for="s4"><span class="radio-dot"></span>Especializarme</label></div>
+      <div class="radio-item"><input type="radio" name="situacion" id="s5" value="Quiero emprender" onchange="autoSave()"><label for="s5"><span class="radio-dot"></span>Emprender</label></div>
+      <div class="radio-item"><input type="radio" name="situacion" id="s6" value="Aún no lo tengo claro" onchange="autoSave()"><label for="s6"><span class="radio-dot"></span>Aún no lo tengo claro</label></div>
+    </div>
+  </div>
+
+  <div class="motivacion">"El punto de partida es reconocer dónde estás. A partir de ahí, todo mejora."</div>
+  <div class="step-nav-btns">
+    <button class="btn btn-primary" onclick="goStep(2)">Siguiente → Competencias</button>
+  </div>
+</section>
+
+<!-- PASO 2 -->
+<section class="step-panel" id="step2">
+  <div class="step-header">
+    <span class="step-number">Paso 2</span>
+    <h2>Competencias</h2>
+    <p>Valora del 1 al 5 cada competencia, tu interés y la evidencia que tienes.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Escala de valoración</div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:0.8rem;">
+      <span>⭐ No lo domino todavía</span>
+      <span>⭐⭐ Lo he trabajado poco</span>
+      <span>⭐⭐⭐ Tengo una base aceptable</span>
+      <span>⭐⭐⭐⭐ Lo aplico con autonomía</span>
+      <span>⭐⭐⭐⭐⭐ Lo domino y puedo demostrarlo</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Competencias técnicas</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th style="width:140px">Competencia</th>
+        <th>Nivel</th>
+        <th>Interés</th>
+        <th>Evidencia</th>
+      </tr></thead>
+      <tbody id="comp-tec-body"></tbody>
+    </table>
+    <div id="gaps-tec"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Competencias personales y sociales</div>
+    <table class="comp-table">
+      <thead><tr>
+        <th style="width:160px">Competencia</th>
+        <th>Nivel</th>
+        <th>Interés</th>
+        <th>Evidencia</th>
+      </tr></thead>
+      <tbody id="comp-per-body"></tbody>
+    </table>
+    <div id="gaps-per"></div>
+  </div>
+
+  <div class="motivacion">"Detectar un gap es el primer paso para mejorar."</div>
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(1)">← Anterior</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Siguiente → Intereses</button>
+  </div>
+</section>
+
+<!-- PASO 3 -->
+<section class="step-panel" id="step3">
+  <div class="step-header">
+    <span class="step-number">Paso 3</span>
+    <h2>Intereses y destrezas</h2>
+    <p>Selecciona las áreas que más te atraen y tus puntos fuertes personales.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Áreas de interés</div>
+    <div class="tags-wrap" id="intereses-wrap"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Mis destrezas</div>
+    <div class="tags-wrap" id="destrezas-wrap"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Reflexión personal</div>
+    <label>Mis principales intereses y destrezas son…</label>
+    <textarea id="reflexion-intereses" rows="4" placeholder="Describe en tus propias palabras qué te motiva y en qué eres bueno/a..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(2)">← Anterior</button>
+    <button class="btn btn-primary" onclick="goStep(4)">Siguiente → Oferta real</button>
+  </div>
+</section>
+
+<!-- PASO 4 -->
+<section class="step-panel" id="step4">
+  <div class="step-header">
+    <span class="step-number">Paso 4</span>
+    <h2>Análisis de una oferta real</h2>
+    <p>Busca una oferta de empleo real que te interese y analízala.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de la oferta</div>
+    <div class="field-row">
+      <div>
+        <label>Puesto o perfil</label>
+        <input type="text" id="oferta-puesto" placeholder="Ej. Desarrollador/a junior Android" oninput="autoSave()">
+      </div>
+      <div>
+        <label>Empresa o portal</label>
+        <input type="text" id="oferta-empresa" placeholder="Ej. InfoJobs, LinkedIn, empresa X" oninput="autoSave()">
+      </div>
+    </div>
+    <label>Enlace (si existe)</label>
+    <input type="url" id="oferta-enlace" placeholder="https://..." oninput="autoSave()">
+    <label>Tecnologías solicitadas</label>
+    <textarea id="oferta-tecnologias" rows="3" placeholder="Ej. Java, Kotlin, Git, Android Studio..." oninput="autoSave()"></textarea>
+    <label>Competencias solicitadas</label>
+    <textarea id="oferta-competencias" rows="3" placeholder="Ej. Trabajo en equipo, inglés B2, resolución de problemas..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Mi análisis</div>
+    <label>Requisitos que ya cumplo</label>
+    <textarea id="oferta-cumplo" rows="3" placeholder="¿Qué de lo que piden ya tienes?" oninput="autoSave()"></textarea>
+    <label>Requisitos que necesito mejorar</label>
+    <textarea id="oferta-mejoro" rows="3" placeholder="¿Qué te falta o debes reforzar?" oninput="autoSave()"></textarea>
+    <label>Conclusión</label>
+    <textarea id="oferta-conclusion" rows="3" placeholder="Después de analizar esta oferta, creo que para mejorar mi inserción profesional necesito…" oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(3)">← Anterior</button>
+    <button class="btn btn-primary" onclick="goStep(5)">Siguiente → Objetivo SMART</button>
+  </div>
+</section>
+
+<!-- PASO 5 -->
+<section class="step-panel" id="step5">
+  <div class="step-header">
+    <span class="step-number">Paso 5</span>
+    <h2>Objetivo SMART</h2>
+    <p>Define un objetivo concreto, medible y con fecha.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Elige tu objetivo principal</div>
+    <div class="radio-grid">
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm1" value="conseguir mi primer empleo como desarrollador/a junior" onchange="updateSMART()"><label for="sm1"><span class="radio-dot"></span>Primer empleo junior</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm2" value="preparar una candidatura para FCT" onchange="updateSMART()"><label for="sm2"><span class="radio-dot"></span>Candidatura FCT</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm3" value="mejorar mi portfolio" onchange="updateSMART()"><label for="sm3"><span class="radio-dot"></span>Mejorar portfolio</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm4" value="especializarme en backend" onchange="updateSMART()"><label for="sm4"><span class="radio-dot"></span>Especializarme en backend</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm5" value="especializarme en móvil" onchange="updateSMART()"><label for="sm5"><span class="radio-dot"></span>Especializarme en móvil</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm6" value="especializarme en ciberseguridad" onchange="updateSMART()"><label for="sm6"><span class="radio-dot"></span>Especializarme en ciberseguridad</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm7" value="especializarme en IA" onchange="updateSMART()"><label for="sm7"><span class="radio-dot"></span>Especializarme en IA</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm8" value="seguir estudiando" onchange="updateSMART()"><label for="sm8"><span class="radio-dot"></span>Seguir estudiando</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm9" value="emprender" onchange="updateSMART()"><label for="sm9"><span class="radio-dot"></span>Emprender</label></div>
+      <div class="radio-item"><input type="radio" name="smart-obj" id="sm10" value="definir mi objetivo (aún no lo tengo claro)" onchange="updateSMART()"><label for="sm10"><span class="radio-dot"></span>Aún no lo tengo claro</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Frase SMART</div>
+    <div class="smart-formula" id="smart-preview">
+      <em>Selecciona un objetivo arriba para generar tu frase SMART.</em>
+    </div>
+    <label>Edita y personaliza tu frase SMART</label>
+    <textarea class="smart-edit" id="smart-texto" rows="5" placeholder="Tu frase SMART aparecerá aquí al seleccionar un objetivo..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="motivacion">"Ya tienes un objetivo más concreto. Ahora ponle fecha y acción."</div>
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(4)">← Anterior</button>
+    <button class="btn btn-primary" onclick="goStep(6)">Siguiente → DAFO y Plan</button>
+  </div>
+</section>
+
+<!-- PASO 6 -->
+<section class="step-panel" id="step6">
+  <div class="step-header">
+    <span class="step-number">Paso 6</span>
+    <h2>Análisis DAFO y Plan de acción</h2>
+    <p>Reflexiona sobre tu situación y planifica tus próximos pasos.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">DAFO</div>
+    <div class="dafo-grid">
+      <div class="dafo-cell fortalezas">
+        <div class="dafo-label">💪 Fortalezas</div>
+        <textarea id="dafo-f" placeholder="¿En qué destacas? ¿Qué sabes hacer bien?" oninput="autoSave()"></textarea>
+      </div>
+      <div class="dafo-cell debilidades">
+        <div class="dafo-label">⚠️ Debilidades</div>
+        <textarea id="dafo-d" placeholder="¿Qué te falta? ¿Qué gaps tienes?" oninput="autoSave()"></textarea>
+      </div>
+      <div class="dafo-cell oportunidades">
+        <div class="dafo-label">🚀 Oportunidades</div>
+        <textarea id="dafo-o" placeholder="¿Qué tienes a favor en el entorno?" oninput="autoSave()"></textarea>
+        <div class="sugerencias">
+          <div class="sugerencias-title">Sugerencias →</div>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'Digitalización de empresas')">Digitalización</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'Demanda de perfiles de desarrollo')">Demanda de perfiles</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'Crecimiento de IA, cloud y móvil')">IA, cloud, móvil</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'FCT y prácticas')">FCT y prácticas</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'GitHub y portfolio')">GitHub / portfolio</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-o', 'Cursos online gratuitos')">Cursos online</span>
+        </div>
+      </div>
+      <div class="dafo-cell amenazas">
+        <div class="dafo-label">⛔ Amenazas</div>
+        <textarea id="dafo-a" placeholder="¿Qué factores externos dificultan tu inserción?" oninput="autoSave()"></textarea>
+        <div class="sugerencias">
+          <div class="sugerencias-title">Sugerencias →</div>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Competencia con otros candidatos')">Competencia</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Ofertas que piden experiencia')">Experiencia requerida</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Cambios tecnológicos rápidos')">Cambios tecnológicos</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Falta de portfolio')">Sin portfolio</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Nivel de inglés técnico bajo')">Inglés técnico</span>
+          <span class="sugerencia-chip" onclick="addSugerencia('dafo-a', 'Pocas ofertas junior')">Pocas ofertas junior</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">CAME</div>
+    <div class="field-row">
+      <div>
+        <label>🔧 Corregir debilidades</label>
+        <textarea id="came-c" rows="3" placeholder="¿Cómo vas a corregir tus debilidades?" oninput="autoSave()"></textarea>
+      </div>
+      <div>
+        <label>🛡️ Afrontar amenazas</label>
+        <textarea id="came-a" rows="3" placeholder="¿Cómo afrontarás las amenazas externas?" oninput="autoSave()"></textarea>
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label>✅ Mantener fortalezas</label>
+        <textarea id="came-m" rows="3" placeholder="¿Cómo vas a consolidar y mantener lo que ya tienes?" oninput="autoSave()"></textarea>
+      </div>
+      <div>
+        <label>🌟 Explotar oportunidades</label>
+        <textarea id="came-e" rows="3" placeholder="¿Cómo aprovecharás las oportunidades del entorno?" oninput="autoSave()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Plan de acción</div>
+    <div style="overflow-x:auto">
+      <table class="plan-table">
+        <thead><tr>
+          <th>Acción</th>
+          <th>Gap / Competencia</th>
+          <th>Fecha límite</th>
+          <th>Recurso necesario</th>
+          <th>Evidencia</th>
+          <th>Estado</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="plan-tbody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-outline btn-add-row" onclick="addPlanRow()">+ Añadir acción</button>
+  </div>
+
+  <div class="motivacion">"Ahora tienes acciones concretas para avanzar. Cada paso suma."</div>
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(5)">← Anterior</button>
+    <button class="btn btn-primary" onclick="goStep(7)">Siguiente → Informe final</button>
+  </div>
+</section>
+
+<!-- PASO 7 -->
+<section class="step-panel" id="step7">
+  <div class="step-header">
+    <span class="step-number">Paso 7</span>
+    <h2>Recursos e Informe final</h2>
+    <p>Selecciona los recursos que usarás y descarga tu informe.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recursos disponibles — Elige 3</div>
+    <div class="recursos-grid">
+      <div class="tag-check"><input type="checkbox" id="r-sepe" value="SEPE" onchange="checkRecursosLimit();autoSave()"><label for="r-sepe">📋 SEPE</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-linkedin" value="LinkedIn" onchange="checkRecursosLimit();autoSave()"><label for="r-linkedin">💼 LinkedIn</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-infojobs" value="InfoJobs" onchange="checkRecursosLimit();autoSave()"><label for="r-infojobs">🔍 InfoJobs</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-tecnoempleo" value="Tecnoempleo" onchange="checkRecursosLimit();autoSave()"><label for="r-tecnoempleo">💻 Tecnoempleo</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-github" value="GitHub" onchange="checkRecursosLimit();autoSave()"><label for="r-github">🐙 GitHub</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-europass" value="Europass" onchange="checkRecursosLimit();autoSave()"><label for="r-europass">🇪🇺 Europass</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-todofp" value="TodoFP" onchange="checkRecursosLimit();autoSave()"><label for="r-todofp">🎓 TodoFP</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-incibe" value="INCIBE" onchange="checkRecursosLimit();autoSave()"><label for="r-incibe">🔒 INCIBE</label></div>
+      <div class="tag-check"><input type="checkbox" id="r-tutor" value="Profesorado y tutor FCT" onchange="checkRecursosLimit();autoSave()"><label for="r-tutor">👨‍🏫 Tutor FCT</label></div>
+    </div>
+    <label>¿Para qué usarás cada recurso elegido?</label>
+    <textarea id="recursos-uso" rows="4" placeholder="Explica brevemente para qué usarás cada recurso seleccionado..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Conclusión personal</div>
+    <label>Después de realizar este proyecto, he descubierto que…</label>
+    <textarea id="conclusion" rows="5" placeholder="Reflexiona sobre lo aprendido, lo que has descubierto sobre ti mismo/a y tus próximos pasos..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Resumen para el profesor/a</div>
+    <textarea id="resumen-prof" rows="4" placeholder="Escribe un resumen breve de tu proyecto para que el/la profesor/a lo revise de un vistazo..." oninput="autoSave()"></textarea>
+  </div>
+
+  <div class="motivacion">"Descarga o imprime tu informe y súbelo a Classroom. ¡Enhorabuena!"</div>
+
+  <div class="step-nav-btns">
+    <button class="btn btn-outline" onclick="goStep(6)">← Anterior</button>
+    <button class="btn btn-primary" onclick="generarInforme()">📄 Generar informe</button>
+    <button class="btn btn-dark" onclick="imprimirInforme()">🖨️ Imprimir / PDF</button>
+  </div>
+
+  <div id="informe-preview" style="margin-top:32px;display:none"></div>
+</section>
+
+</main>
+
+<script>
+// ——— CONFIG ———
+const STORAGE_KEY = 'dam_proyecto_profesional_v2';
+const COMP_TEC = ['Programación','Bases de datos','Interfaces','Desarrollo móvil','APIs','Seguridad','Testing','Git','Documentación','Despliegue'];
+const COMP_PER = ['Responsabilidad','Organización','Aprendizaje continuo','Resolución de problemas','Autonomía','Comunicación','Trabajo en equipo','Presentación de proyectos'];
+const INTERESES = ['Backend','Frontend','Full stack','Móvil','Bases de datos','Ciberseguridad','IA','Cloud','Testing','Videojuegos','ERP-CRM','UX/UI'];
+const DESTREZAS = ['Pensamiento lógico','Creatividad','Paciencia para depurar errores','Organización','Comunicación','Curiosidad tecnológica','Trabajo autónomo','Trabajo en equipo','Atención al detalle','Capacidad para investigar'];
+const RECURSOS_IDS = ['r-sepe','r-linkedin','r-infojobs','r-tecnoempleo','r-github','r-europass','r-todofp','r-incibe','r-tutor'];
+
+let currentStep = 1;
+let data = {};
+let autoSaveTimer = null;
+
+// ——— INIT ———
+function init() {
+  document.getElementById('fecha-display').textContent = new Date().toLocaleDateString('es-ES', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  buildCompTable('comp-tec-body', COMP_TEC, 'tec');
+  buildCompTable('comp-per-body', COMP_PER, 'per');
+  buildTags('intereses-wrap', INTERESES, 'int');
+  buildTags('destrezas-wrap', DESTREZAS, 'des');
+  loadData();
+  updateProgress();
+}
+
+// ——— COMPETENCIAS ———
+function buildCompTable(tbodyId, comps, prefix) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  comps.forEach((c, i) => {
+    const id = prefix + '_' + i;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="comp-name">${c}<br><span class="gap-badge" id="gap_${id}" style="display:none">⚠ Gap detectado</span></td>
+      <td>
+        <div class="star-row" id="stars_${id}">
+          ${[1,2,3,4,5].map(n=>`<button class="star-btn" data-v="${n}" onclick="setStars('${id}',${n})">★</button>`).join('')}
+        </div>
+      </td>
+      <td>
+        <select class="comp-select" id="int_${id}" onchange="checkGap('${id}');autoSave()">
+          <option value="">Interés</option>
+          <option value="bajo">Bajo</option>
+          <option value="medio">Medio</option>
+          <option value="alto">Alto</option>
+        </select>
+      </td>
+      <td>
+        <select class="comp-select" id="ev_${id}" onchange="autoSave()">
+          <option value="">Evidencia</option>
+          <option value="ninguna">Ninguna</option>
+          <option value="proyecto">Proyecto</option>
+          <option value="github">GitHub</option>
+          <option value="práctica">Práctica</option>
+          <option value="curso">Curso</option>
+          <option value="otra">Otra</option>
+        </select>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function setStars(id, val) {
+  const stars = document.querySelectorAll(`#stars_${id} .star-btn`);
+  stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.v) <= val));
+  data[`star_${id}`] = val;
+  checkGap(id);
+  autoSave();
+}
+
+function checkGap(id) {
+  const val = data[`star_${id}`] || 0;
+  const intSel = document.getElementById(`int_${id}`);
+  const intVal = intSel ? intSel.value : '';
+  const badge = document.getElementById(`gap_${id}`);
+  const isGap = val <= 2 || (intVal === 'alto' && val <= 3);
+  if (badge) badge.style.display = isGap ? 'inline-block' : 'none';
+  renderGapNotice();
+}
+
+function renderGapNotice() {
+  ['tec','per'].forEach(prefix => {
+    const comps = prefix === 'tec' ? COMP_TEC : COMP_PER;
+    const gapsEl = document.getElementById('gaps_' + prefix);
+    if (!gapsEl) return;
+    const gaps = [];
+    comps.forEach((c, i) => {
+      const id = prefix + '_' + i;
+      const badge = document.getElementById('gap_' + id);
+      if (badge && badge.style.display !== 'none') gaps.push(c);
+    });
+    if (gaps.length > 0) {
+      gapsEl.innerHTML = `<div class="gap-notice"><strong>⚠️ Gaps detectados</strong>Las siguientes competencias necesitan atención: ${gaps.join(', ')}. Detección temprana = ventaja.</div>`;
+    } else {
+      gapsEl.innerHTML = '';
+    }
+  });
+}
+
+// ——— TAGS ———
+function buildTags(wrapId, items, prefix) {
+  const wrap = document.getElementById(wrapId);
+  wrap.innerHTML = '';
+  items.forEach((item, i) => {
+    const id = `${prefix}_${i}`;
+    const div = document.createElement('div');
+    div.className = 'tag-check';
+    div.innerHTML = `<input type="checkbox" id="${id}" value="${item}" onchange="autoSave()"><label for="${id}">${item}</label>`;
+    wrap.appendChild(div);
+  });
+}
+
+// ——— SMART ———
+function updateSMART() {
+  const r = document.querySelector('input[name="smart-obj"]:checked');
+  if (!r) return;
+  const obj = r.value;
+  const frase = `Como Técnico/a Superior en DAM, quiero ${obj} mediante [acciones concretas: cursos, proyectos, candidaturas], y sabré que lo he conseguido cuando [resultado medible]. Quiero lograrlo antes de [fecha], porque [motivación personal].`;
+  document.getElementById('smart-preview').innerHTML = `<em>${frase}</em>`;
+  if (!document.getElementById('smart-texto').value) {
+    document.getElementById('smart-texto').value = frase;
+  }
+  autoSave();
+}
+
+// ——— PLAN DE ACCIÓN ———
+let planRows = [];
+
+function addPlanRow(rowData) {
+  const tbody = document.getElementById('plan-tbody');
+  const idx = Date.now();
+  const row = document.createElement('tr');
+  row.id = 'plan_' + idx;
+  row.innerHTML = `
+    <td><input type="text" placeholder="Ej. Completar curso de Kotlin" value="${rowData?.accion||''}" onchange="savePlanRow('${idx}','accion',this.value)"></td>
+    <td><input type="text" placeholder="Ej. Desarrollo móvil" value="${rowData?.gap||''}" onchange="savePlanRow('${idx}','gap',this.value)"></td>
+    <td><input type="date" value="${rowData?.fecha||''}" onchange="savePlanRow('${idx}','fecha',this.value)"></td>
+    <td><input type="text" placeholder="Ej. Udemy, YouTube" value="${rowData?.recurso||''}" onchange="savePlanRow('${idx}','recurso',this.value)"></td>
+    <td><input type="text" placeholder="Ej. Certificado" value="${rowData?.evidencia||''}" onchange="savePlanRow('${idx}','evidencia',this.value)"></td>
+    <td><select onchange="savePlanRow('${idx}','estado',this.value)">
+      <option value="pendiente" ${(rowData?.estado||'pendiente')==='pendiente'?'selected':''}>⏳ Pendiente</option>
+      <option value="en proceso" ${rowData?.estado==='en proceso'?'selected':''}>🔄 En proceso</option>
+      <option value="conseguido" ${rowData?.estado==='conseguido'?'selected':''}>✅ Conseguido</option>
+    </select></td>
+    <td><button class="btn-rm" onclick="removePlanRow('${idx}')">✕</button></td>`;
+  tbody.appendChild(row);
+  if (!rowData) {
+    planRows.push({id: String(idx), accion:'',gap:'',fecha:'',recurso:'',evidencia:'',estado:'pendiente'});
+    autoSave();
+  }
+}
+
+function savePlanRow(idx, field, val) {
+  const row = planRows.find(r => r.id === String(idx));
+  if (row) row[field] = val;
+  else planRows.push({id: String(idx), [field]: val});
+  autoSave();
+}
+
+function removePlanRow(idx) {
+  document.getElementById('plan_' + idx)?.remove();
+  planRows = planRows.filter(r => r.id !== String(idx));
+  autoSave();
+}
+
+// ——— SUGERENCIAS DAFO ———
+function addSugerencia(fieldId, text) {
+  const ta = document.getElementById(fieldId);
+  ta.value = ta.value ? ta.value + '\n' + text : text;
+  autoSave();
+}
+
+// ——— RECURSOS ———
+function checkRecursosLimit() {
+  const checked = RECURSOS_IDS.filter(id => document.getElementById(id)?.checked);
+  if (checked.length >= 3) {
+    RECURSOS_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.checked) el.disabled = true;
+    });
+  } else {
+    RECURSOS_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
+  }
+}
+
+// ——— NAVEGACIÓN ———
+function goStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.step-tab').forEach((t, i) => {
+    t.classList.remove('active');
+    if (i < n-1) t.classList.add('done');
+    else t.classList.remove('done');
+  });
+  document.getElementById('step' + n).classList.add('active');
+  document.querySelectorAll('.step-tab')[n-1].classList.add('active');
+  currentStep = n;
+  updateProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function updateProgress() {
+  const pct = Math.round(((currentStep - 1) / 6) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Paso ${currentStep} de 7`;
+}
+
+// ——— SAVE / LOAD ———
+function collectData() {
+  const d = {};
+  d.nombre = document.getElementById('nombre')?.value || '';
+  const sit = document.querySelector('input[name="situacion"]:checked');
+  d.situacion = sit ? sit.value : '';
+
+  // Competencias
+  [...COMP_TEC.map((_,i)=>'tec_'+i), ...COMP_PER.map((_,i)=>'per_'+i)].forEach(id => {
+    d['star_'+id] = data['star_'+id] || 0;
+    const intEl = document.getElementById('int_'+id);
+    const evEl = document.getElementById('ev_'+id);
+    if (intEl) d['int_'+id] = intEl.value;
+    if (evEl) d['ev_'+id] = evEl.value;
+  });
+
+  // Intereses y destrezas
+  d.intereses = INTERESES.map((_,i) => document.getElementById('int_'+i)?.checked ? INTERESES[i] : null).filter(Boolean);
+  // Fix: intereses uses 'int_' prefix, destrezas uses 'des_'
+  d.intereses = [];
+  INTERESES.forEach((item, i) => { const el = document.getElementById('int_'+i); if (el && el.checked) d.intereses.push(item); });
+  d.destrezas = [];
+  DESTREZAS.forEach((item, i) => { const el = document.getElementById('des_'+i); if (el && el.checked) d.destrezas.push(item); });
+  d.reflexion_intereses = document.getElementById('reflexion-intereses')?.value || '';
+
+  // Oferta
+  ['puesto','empresa','enlace','tecnologias','competencias','cumplo','mejoro','conclusion'].forEach(f => {
+    d['oferta_'+f] = document.getElementById('oferta-'+f)?.value || '';
+  });
+
+  // SMART
+  const sObj = document.querySelector('input[name="smart-obj"]:checked');
+  d.smart_obj = sObj ? sObj.value : '';
+  d.smart_texto = document.getElementById('smart-texto')?.value || '';
+
+  // DAFO
+  ['f','d','o','a'].forEach(k => { d['dafo_'+k] = document.getElementById('dafo-'+k)?.value || ''; });
+  ['c','a','m','e'].forEach(k => { d['came_'+k] = document.getElementById('came-'+k)?.value || ''; });
+
+  // Plan
+  d.planRows = JSON.parse(JSON.stringify(planRows));
+
+  // Recursos
+  d.recursos = RECURSOS_IDS.map(id => {
+    const el = document.getElementById(id);
+    return el && el.checked ? el.value : null;
+  }).filter(Boolean);
+  d.recursos_uso = document.getElementById('recursos-uso')?.value || '';
+
+  // Conclusión
+  d.conclusion = document.getElementById('conclusion')?.value || '';
+  d.resumen_prof = document.getElementById('resumen-prof')?.value || '';
+  d.currentStep = currentStep;
+  return d;
+}
+
+function applyData(d) {
+  if (!d) return;
+  data = d;
+
+  if (d.nombre) document.getElementById('nombre').value = d.nombre;
+
+  // Situación
+  if (d.situacion) {
+    document.querySelectorAll('input[name="situacion"]').forEach(r => {
+      if (r.value === d.situacion) r.checked = true;
+    });
+  }
+
+  // Competencias
+  [...COMP_TEC.map((_,i)=>'tec_'+i), ...COMP_PER.map((_,i)=>'per_'+i)].forEach(id => {
+    const v = d['star_'+id] || 0;
+    if (v > 0) {
+      document.querySelectorAll(`#stars_${id} .star-btn`).forEach(s => s.classList.toggle('active', parseInt(s.dataset.v) <= v));
+    }
+    const intEl = document.getElementById('int_'+id);
+    const evEl = document.getElementById('ev_'+id);
+    if (intEl && d['int_'+id]) intEl.value = d['int_'+id];
+    if (evEl && d['ev_'+id]) evEl.value = d['ev_'+id];
+    checkGap(id);
+  });
+
+  // Intereses
+  if (d.intereses) d.intereses.forEach(item => { const i = INTERESES.indexOf(item); const el = document.getElementById('int_'+i); if (el) el.checked = true; });
+  if (d.destrezas) d.destrezas.forEach(item => { const i = DESTREZAS.indexOf(item); const el = document.getElementById('des_'+i); if (el) el.checked = true; });
+  if (d.reflexion_intereses) document.getElementById('reflexion-intereses').value = d.reflexion_intereses;
+
+  // Oferta
+  ['puesto','empresa','enlace','tecnologias','competencias','cumplo','mejoro','conclusion'].forEach(f => {
+    const el = document.getElementById('oferta-'+f); if (el && d['oferta_'+f]) el.value = d['oferta_'+f];
+  });
+
+  // SMART
+  if (d.smart_obj) {
+    document.querySelectorAll('input[name="smart-obj"]').forEach(r => { if (r.value === d.smart_obj) r.checked = true; });
+  }
+  if (d.smart_texto) document.getElementById('smart-texto').value = d.smart_texto;
+
+  // DAFO
+  ['f','d','o','a'].forEach(k => { const el = document.getElementById('dafo-'+k); if (el && d['dafo_'+k]) el.value = d['dafo_'+k]; });
+  ['c','a','m','e'].forEach(k => { const el = document.getElementById('came-'+k); if (el && d['came_'+k]) el.value = d['came_'+k]; });
+
+  // Plan
+  if (d.planRows && d.planRows.length > 0) {
+    planRows = d.planRows;
+    d.planRows.forEach(row => addPlanRow(row));
+  }
+
+  // Recursos
+  if (d.recursos) {
+    RECURSOS_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.checked = d.recursos.includes(el.value);
+    });
+    checkRecursosLimit();
+  }
+  if (d.recursos_uso) document.getElementById('recursos-uso').value = d.recursos_uso;
+  if (d.conclusion) document.getElementById('conclusion').value = d.conclusion;
+  if (d.resumen_prof) document.getElementById('resumen-prof').value = d.resumen_prof;
+
+  if (d.currentStep) goStep(d.currentStep);
+}
+
+function autoSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData())); } catch(e) {}
+  }, 600);
+}
+
+function guardarAhora() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+    showToast('✅ Guardado correctamente');
+  } catch(e) { showToast('❌ Error al guardar'); }
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) applyData(JSON.parse(raw));
+  } catch(e) {}
+}
+
+function borrarTodo() {
+  if (confirm('⚠️ ¿Seguro que quieres borrar todos los datos? Esta acción no se puede deshacer.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+// ——— TOAST ———
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1a1714;color:#fff;padding:10px 20px;border-radius:8px;font-size:.85rem;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2200);
+}
+
+// ——— INFORME ———
+function generarInforme() {
+  const d = collectData();
+  const fecha = new Date().toLocaleDateString('es-ES', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Gaps
+  const gaps = [];
+  COMP_TEC.forEach((c, i) => {
+    const id = 'tec_' + i;
+    const v = d['star_'+id] || 0;
+    const intV = d['int_'+id] || '';
+    if (v <= 2 || (intV === 'alto' && v <= 3)) gaps.push(c);
+  });
+  COMP_PER.forEach((c, i) => {
+    const id = 'per_' + i;
+    const v = d['star_'+id] || 0;
+    const intV = d['int_'+id] || '';
+    if (v <= 2 || (intV === 'alto' && v <= 3)) gaps.push(c);
+  });
+
+  // Mejores competencias
+  const scored = [];
+  COMP_TEC.forEach((c, i) => { scored.push({c, v: d['star_tec_'+i] || 0}); });
+  COMP_PER.forEach((c, i) => { scored.push({c, v: d['star_per_'+i] || 0}); });
+  const top = scored.filter(x => x.v >= 4).map(x => x.c);
+
+  // Plan rows
+  let planHTML = '';
+  if (planRows.length > 0) {
+    planHTML = `<table><thead><tr><th>Acción</th><th>Gap</th><th>Fecha</th><th>Recurso</th><th>Evidencia</th><th>Estado</th></tr></thead><tbody>
+      ${planRows.map(r => `<tr><td>${r.accion||''}</td><td>${r.gap||''}</td><td>${r.fecha||''}</td><td>${r.recurso||''}</td><td>${r.evidencia||''}</td><td>${r.estado||''}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  const html = `
+    <div style="border-bottom:3px solid #c8501a;padding-bottom:16px;margin-bottom:20px">
+      <div style="font-size:.75rem;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Escolapios de Getafe · DAM</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:6px">Proyecto de Inserción Profesional</h1>
+    </div>
+    <div class="informe-meta">
+      <span><strong>Alumno/a:</strong> ${d.nombre || '—'}</span>
+      <span><strong>Centro:</strong> Escolapios de Getafe</span>
+      <span><strong>Ciclo:</strong> Técnico/a Superior en DAM</span>
+      <span><strong>Fecha:</strong> ${fecha}</span>
+      <span><strong>Situación:</strong> ${d.situacion || '—'}</span>
+    </div>
+
+    <h2>1. Competencias mejor valoradas</h2>
+    ${top.length > 0 ? `<div class="tag-list">${top.map(c=>`<span class="tag">${c}</span>`).join('')}</div>` : '<p>—</p>'}
+
+    <h2>2. Gaps detectados</h2>
+    ${gaps.length > 0 ? `<div class="tag-list gap-list">${gaps.map(c=>`<span class="tag">⚠ ${c}</span>`).join('')}</div>` : '<p>Sin gaps detectados.</p>'}
+
+    <h2>3. Intereses y destrezas</h2>
+    <h3>Intereses</h3>
+    <div class="tag-list">${(d.intereses||[]).map(x=>`<span class="tag">${x}</span>`).join('') || '—'}</div>
+    <h3>Destrezas</h3>
+    <div class="tag-list">${(d.destrezas||[]).map(x=>`<span class="tag">${x}</span>`).join('') || '—'}</div>
+    <p><em>${d.reflexion_intereses || ''}</em></p>
+
+    <h2>4. Oferta analizada</h2>
+    <table><tbody>
+      <tr><th>Puesto</th><td>${d.oferta_puesto||'—'}</td><th>Empresa/Portal</th><td>${d.oferta_empresa||'—'}</td></tr>
+      <tr><th>Enlace</th><td colspan="3">${d.oferta_enlace||'—'}</td></tr>
+      <tr><th>Tecnologías</th><td colspan="3">${d.oferta_tecnologias||'—'}</td></tr>
+      <tr><th>Competencias</th><td colspan="3">${d.oferta_competencias||'—'}</td></tr>
+      <tr><th>Cumplo</th><td colspan="3">${d.oferta_cumplo||'—'}</td></tr>
+      <tr><th>Necesito mejorar</th><td colspan="3">${d.oferta_mejoro||'—'}</td></tr>
+      <tr><th>Conclusión</th><td colspan="3">${d.oferta_conclusion||'—'}</td></tr>
+    </tbody></table>
+
+    <h2>5. Objetivo SMART</h2>
+    <p>${d.smart_texto || '—'}</p>
+
+    <h2>6. Análisis DAFO</h2>
+    <div class="informe-dafo">
+      <div class="informe-dafo-cell" style="background:#edfaef;border-color:#b5dfbe"><strong style="color:#2a7a3b">💪 Fortalezas</strong><p>${d.dafo_f||'—'}</p></div>
+      <div class="informe-dafo-cell" style="background:#fff7ed;border-color:#f5c8a0"><strong style="color:#a85010">⚠️ Debilidades</strong><p>${d.dafo_d||'—'}</p></div>
+      <div class="informe-dafo-cell" style="background:#edf4ff;border-color:#b0cbf5"><strong style="color:#2050a0">🚀 Oportunidades</strong><p>${d.dafo_o||'—'}</p></div>
+      <div class="informe-dafo-cell" style="background:#fff0f0;border-color:#f5c0c0"><strong style="color:#8b2020">⛔ Amenazas</strong><p>${d.dafo_a||'—'}</p></div>
+    </div>
+
+    <h2>7. Estrategia CAME</h2>
+    <table><tbody>
+      <tr><th>🔧 Corregir</th><td>${d.came_c||'—'}</td></tr>
+      <tr><th>🛡️ Afrontar</th><td>${d.came_a||'—'}</td></tr>
+      <tr><th>✅ Mantener</th><td>${d.came_m||'—'}</td></tr>
+      <tr><th>🌟 Explotar</th><td>${d.came_e||'—'}</td></tr>
+    </tbody></table>
+
+    <h2>8. Plan de acción</h2>
+    ${planHTML || '<p>—</p>'}
+
+    <h2>9. Recursos elegidos</h2>
+    <div class="tag-list">${(d.recursos||[]).map(x=>`<span class="tag">${x}</span>`).join('') || '—'}</div>
+    <p>${d.recursos_uso || ''}</p>
+
+    <h2>10. Conclusión personal</h2>
+    <p>${d.conclusion ? 'Después de realizar este proyecto, he descubierto que ' + d.conclusion : '—'}</p>
+
+    <h2>11. Resumen para el/la profesor/a</h2>
+    <p>${d.resumen_prof || '—'}</p>
+
+    <div style="margin-top:28px;padding:14px 18px;background:#f5f3ef;border-radius:8px;font-size:.8rem;color:#888;border:1px solid #ddd9d2">
+      Documento generado con la aplicación Proyecto Profesional DAM · Escolapios de Getafe · ${fecha}
+    </div>`;
+
+  const preview = document.getElementById('informe-preview');
+  preview.innerHTML = html;
+  preview.style.display = 'block';
+  preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function imprimirInforme() {
+  if (currentStep !== 7) {
+    goStep(7);
+    setTimeout(() => { generarInforme(); setTimeout(() => window.print(), 400); }, 300);
+  } else {
+    generarInforme();
+    setTimeout(() => window.print(), 300);
+  }
+}
+
+function descargarHTML() {
+  guardarAhora();
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const nombre = document.getElementById('nombre')?.value?.replace(/\s+/g,'_') || 'alumno';
+  a.download = `Proyecto_DAM_${nombre}.html`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+init();
+</script>
+</body>
+</html>
