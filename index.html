@@ -798,6 +798,12 @@ textarea { resize: vertical; min-height: 70px; }
 
   <div class="card">
     <div class="card-title">DAFO</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:12px 16px;background:var(--accent-light);border:1.5px solid #f0c8a8;border-radius:8px;">
+      <div style="font-size:.84rem;color:var(--text2);">
+        <strong style="color:var(--accent);">✨ Autorellenar disponible</strong> — Puedo pre-rellenar el DAFO con los datos de tus pasos anteriores (competencias, gaps, intereses y oferta analizada). Podrás editarlo libremente después.
+      </div>
+      <button class="btn btn-primary" onclick="autorellenarDAFO()" style="flex-shrink:0">⚡ Autorellenar desde mi análisis</button>
+    </div>
     <div class="dafo-grid">
       <div class="dafo-cell fortalezas">
         <div class="dafo-label">💪 Fortalezas</div>
@@ -1436,6 +1442,65 @@ function descargarHTML() {
   a.download = `Proyecto_DAM_${nombre}.html`;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// --- AUTORELLENAR DAFO ---
+function autorellenarDAFO() {
+  const d = collectData();
+
+  // FORTALEZAS: competencias con puntuacion 4 o 5
+  const fortalezas = [];
+  COMP_TEC.forEach((c, i) => { const v = d['star_tec_'+i] || 0; if (v >= 4) fortalezas.push(c + ' (nivel ' + v + '/5)'); });
+  COMP_PER.forEach((c, i) => { const v = d['star_per_'+i] || 0; if (v >= 4) fortalezas.push(c + ' (nivel ' + v + '/5)'); });
+  if (d.intereses && d.intereses.length > 0) fortalezas.push('Interes en: ' + d.intereses.join(', '));
+  if (d.destrezas && d.destrezas.length > 0) fortalezas.push('Destrezas: ' + d.destrezas.join(', '));
+
+  // DEBILIDADES: gaps detectados
+  const debilidades = [];
+  COMP_TEC.forEach((c, i) => {
+    const id = 'tec_'+i; const v = d['star_'+id] || 0; const intV = d['int_'+id] || '';
+    if (v > 0 && v <= 2) debilidades.push(c + ' — nivel bajo (' + v + '/5)');
+    else if (intV === 'alto' && v > 0 && v <= 3) debilidades.push(c + ' — interes alto pero nivel ' + v + '/5, necesita mejorar');
+  });
+  COMP_PER.forEach((c, i) => {
+    const id = 'per_'+i; const v = d['star_'+id] || 0; const intV = d['int_'+id] || '';
+    if (v > 0 && v <= 2) debilidades.push(c + ' — nivel bajo (' + v + '/5)');
+    else if (intV === 'alto' && v > 0 && v <= 3) debilidades.push(c + ' — interes alto pero nivel ' + v + '/5, necesita mejorar');
+  });
+  if (d.oferta_mejoro && d.oferta_mejoro.trim()) debilidades.push('De la oferta analizada: ' + d.oferta_mejoro.trim());
+
+  // OPORTUNIDADES: intereses + oferta + generales
+  const oportunidades = [];
+  if (d.intereses && d.intereses.length > 0) oportunidades.push('Areas con demanda que me interesan: ' + d.intereses.join(', '));
+  if (d.oferta_cumplo && d.oferta_cumplo.trim()) oportunidades.push('Requisitos que ya cumplo: ' + d.oferta_cumplo.trim());
+  if (d.intereses) {
+    if (d.intereses.includes('IA') || d.intereses.includes('Cloud')) oportunidades.push('Crecimiento del mercado de IA y Cloud');
+    if (d.intereses.includes('Movil') || d.intereses.includes('Móvil')) oportunidades.push('Alta demanda de desarrollo movil');
+    if (d.intereses.includes('Ciberseguridad')) oportunidades.push('Creciente demanda en ciberseguridad');
+    if (d.intereses.includes('Backend') || d.intereses.includes('Full stack')) oportunidades.push('Demanda sostenida de perfiles backend y full stack');
+  }
+  oportunidades.push('FCT y practicas como puerta de entrada al mercado laboral');
+  oportunidades.push('GitHub y portfolio para demostrar competencias sin experiencia previa');
+
+  // AMENAZAS
+  const amenazas = [];
+  if (debilidades.length > 0) amenazas.push('Competencia con candidatos con mayor experiencia practica');
+  if (d.oferta_mejoro && d.oferta_mejoro.trim()) amenazas.push('Requisitos de la oferta aun no cubiertos: ' + d.oferta_mejoro.trim());
+  amenazas.push('Ofertas junior escasas que exigen experiencia previa');
+  amenazas.push('Cambios tecnologicos rapidos que requieren formacion continua');
+  if (!d.intereses || d.intereses.length === 0) amenazas.push('Falta de especializacion definida');
+
+  const hayDatos = document.getElementById('dafo-f').value || document.getElementById('dafo-d').value;
+  if (hayDatos && !confirm('¿Quieres reemplazar el DAFO actual con los datos de tu analisis? Podras editarlo despues.')) return;
+
+  const set = (id, lines) => { const el = document.getElementById(id); if (el && lines.length > 0) el.value = lines.join('\n'); };
+  set('dafo-f', fortalezas.length > 0 ? fortalezas : ['Completa tus competencias en el Paso 2 para ver tus fortalezas aqui.']);
+  set('dafo-d', debilidades.length > 0 ? debilidades : ['Completa tus competencias en el Paso 2 para ver tus gaps aqui.']);
+  set('dafo-o', oportunidades);
+  set('dafo-a', amenazas);
+
+  autoSave();
+  showToast('DAFO rellenado con tu analisis. Puedes editarlo libremente.');
 }
 
 init();
